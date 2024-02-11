@@ -18,125 +18,26 @@ import {
   GridRowModel,
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
-import {
-  randomCreatedDate,
-  randomTraderName,
-  randomId,
-  randomArrayItem,
-} from "@mui/x-data-grid-generator";
+import { randomTraderName, randomId } from "@mui/x-data-grid-generator";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
-import { useState } from "react";
-
-const roles = ["Market", "Finance", "Development"];
-const randomRole = () => {
-  return randomArrayItem(roles);
-};
+import { useEffect, useState } from "react";
+import {
+  getAllTasksForUser,
+  swapTask,
+  updateTask,
+} from "../utils/axiosRequests";
+import { useQuery } from "react-query";
 
 const initialRows: GridRowsProp = [
   {
     id: randomId(),
     name: "asdjklasd aslkdjasdkj askldjaskldj asdkljaskdl asdklj",
     points: 25,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
   },
   {
     id: randomId(),
     name: randomTraderName(),
     points: 36,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 19,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 36,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 19,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 36,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 19,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    points: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
   },
 ];
 
@@ -154,11 +55,19 @@ function EditToolbar(props: EditToolbarProps) {
   const { setRows, setRowModesModel, currentRowId, rows } = props;
 
   const handleUpArrowClick = () => {
+    //Guard clause
     if (currentRowId === undefined) return;
     const currentRowIndex = rows.findIndex(
       (row: GridRowModel) => row.id === currentRowId,
     );
     if (currentRowIndex === 0) return; // Literal edge case
+
+    // Send data to the server
+    const currentRow = rows.find(
+      (row: GridRowModel) => row.id === currentRowId,
+    );
+    swapTask(currentRow, "up");
+
     const targetRowIndex = currentRowIndex - 1;
     setRows((prevRows) => {
       const newRows = [...prevRows];
@@ -168,7 +77,6 @@ function EditToolbar(props: EditToolbarProps) {
       ];
       return newRows;
     });
-    console.log(currentRowIndex);
   };
   const handleDownArrowClick = () => {
     if (currentRowId === undefined) return;
@@ -176,6 +84,10 @@ function EditToolbar(props: EditToolbarProps) {
       (row: GridRowModel) => row.id === currentRowId,
     );
     if (currentRowIndex === rows.length - 1) return; // Literal edge case
+    const currentRow = rows.find(
+      (row: GridRowModel) => row.id === currentRowId,
+    );
+    swapTask(currentRow, "down");
     const targetRowIndex = currentRowIndex + 1;
     setRows((prevRows) => {
       const newRows = [...prevRows];
@@ -185,7 +97,6 @@ function EditToolbar(props: EditToolbarProps) {
       ];
       return newRows;
     });
-    console.log(currentRowIndex);
   };
 
   const handleClick = () => {
@@ -223,10 +134,24 @@ function EditToolbar(props: EditToolbarProps) {
   );
 }
 
-export default function TasksTable() {
+type Props = {
+  user: { userName: string; id: string };
+};
+
+export default function TasksTable(props: Props) {
+  const { user } = props;
   const [rows, setRows] = useState(initialRows);
   const [currentRowId, setCurrentRowId] = useState();
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+  const { data, status, isLoading } = useQuery("tasks", () =>
+    getAllTasksForUser(user.id),
+  );
+
+  useEffect(() => {
+    if (data) {
+      setRows(data);
+    }
+  }, [isLoading]);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -264,13 +189,18 @@ export default function TasksTable() {
   function handleRowClick(params: { row: GridRowModel }) {
     const rowId = params.row.id;
     setCurrentRowId(rowId);
-    console.log(rowId);
-    console.log(rows.length);
   }
 
   const processRowUpdate = (newRow: GridRowModel) => {
+    // Couple of values we need to send the server about our new row
+    newRow.userId = user.id;
+    newRow.index = rows.findIndex((item) => item.id === newRow.id);
+
+    updateTask(newRow);
+    console.log("newRow: ", newRow);
+    // console.log("process ID:", newRow.id);
+    // console.log("nameRow", newRow.name);
     const updatedRow = { ...newRow, isNew: false };
-    console.log("process ID:", newRow.id);
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -299,7 +229,6 @@ export default function TasksTable() {
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
         if (isInEditMode) {
           return [
             <GridActionsCellItem
@@ -354,44 +283,47 @@ export default function TasksTable() {
       },
     },
   ];
-  return (
-    <Box
-      sx={{
-        height: 500,
-        width: "100%",
-        "& .MuiDataGrid-footerContainer": {
-          display: "none",
-        },
-        "& .textPrimary": {
-          color: "text.primary",
-        },
-        "& .MuiDataGrid-root": {
-          height: 811,
-        },
-      }}
-    >
-      <DataGrid
-        rows={rows}
-        disableColumnMenu
-        columns={columns}
-        editMode="row"
-        onRowClick={handleRowClick}
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
+
+  if (status !== "loading") {
+    return (
+      <Box
         sx={{
-          "& .-thumb": {
-            borderRadius: "1px",
+          height: 500,
+          width: "100%",
+          "& .MuiDataGrid-footerContainer": {
+            display: "none",
+          },
+          "& .textPrimary": {
+            color: "text.primary",
+          },
+          "& .MuiDataGrid-root": {
+            height: 811,
           },
         }}
-        slots={{
-          toolbar: EditToolbar,
-        }}
-        slotProps={{
-          toolbar: { setRows, setRowModesModel, currentRowId, rows },
-        }}
-      />
-    </Box>
-  );
+      >
+        <DataGrid
+          rows={rows}
+          disableColumnMenu
+          columns={columns}
+          editMode="row"
+          onRowClick={handleRowClick}
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={handleRowModesModelChange}
+          onRowEditStop={handleRowEditStop}
+          processRowUpdate={processRowUpdate}
+          sx={{
+            "& .-thumb": {
+              borderRadius: "1px",
+            },
+          }}
+          slots={{
+            toolbar: EditToolbar,
+          }}
+          slotProps={{
+            toolbar: { setRows, setRowModesModel, currentRowId, rows },
+          }}
+        />
+      </Box>
+    );
+  }
 }
