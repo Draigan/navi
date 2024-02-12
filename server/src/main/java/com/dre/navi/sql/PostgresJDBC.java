@@ -203,6 +203,12 @@ public class PostgresJDBC
         // Execute INSERT
         ps.executeUpdate();
 
+//        update tasks set index_order =
+//            case when index_order = 2 then 1
+//            when index_order = 1 then 2
+//            end
+//                    where index_order in (2,1) ;
+
         // Close resources
         ps.close();
     }

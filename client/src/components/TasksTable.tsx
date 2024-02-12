@@ -22,6 +22,7 @@ import { randomTraderName, randomId } from "@mui/x-data-grid-generator";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import {
+  deleteTask,
   getAllTasksForUser,
   swapTask,
   updateTask,
@@ -42,19 +43,31 @@ const initialRows: GridRowsProp = [
 ];
 
 interface EditToolbarProps {
+  user: { id: string };
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
   setRowModesModel: (
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
   ) => void;
   rows: GridRowModel;
   currentRowId: string;
+  swapTaskMutation: {
+    mutate: (variables: {
+      row: GridRowModel;
+      direction: string;
+    }) => Promise<string>;
+  };
 }
 
-// Add record button
 function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel, currentRowId, rows } = props;
+  const {
+    setRows,
+    setRowModesModel,
+    currentRowId,
+    rows,
+    // swapTaskMutation,
+  } = props;
 
-  const handleUpArrowClick = () => {
+  const handleUpArrowClick = async () => {
     //Guard clause
     if (currentRowId === undefined) return;
     const currentRowIndex = rows.findIndex(
@@ -62,41 +75,36 @@ function EditToolbar(props: EditToolbarProps) {
     );
     if (currentRowIndex === 0) return; // Literal edge case
 
-    // Send data to the server
+    // Get the actual row
     const currentRow = rows.find(
       (row: GridRowModel) => row.id === currentRowId,
     );
-    swapTask(currentRow, "up");
+    if (!currentRow) return;
 
-    const targetRowIndex = currentRowIndex - 1;
-    setRows((prevRows) => {
-      const newRows = [...prevRows];
-      [newRows[currentRowIndex], newRows[targetRowIndex]] = [
-        newRows[targetRowIndex],
-        newRows[currentRowIndex],
-      ];
-      return newRows;
-    });
+    // Update server
+    let data = await swapTask(currentRow, "up");
+
+    // Update rows with new information
+    setRows(data);
   };
-  const handleDownArrowClick = () => {
+
+  const handleDownArrowClick = async () => {
     if (currentRowId === undefined) return;
     const currentRowIndex = rows.findIndex(
       (row: GridRowModel) => row.id === currentRowId,
     );
     if (currentRowIndex === rows.length - 1) return; // Literal edge case
+    // Get the actual row
     const currentRow = rows.find(
       (row: GridRowModel) => row.id === currentRowId,
     );
-    swapTask(currentRow, "down");
-    const targetRowIndex = currentRowIndex + 1;
-    setRows((prevRows) => {
-      const newRows = [...prevRows];
-      [newRows[currentRowIndex], newRows[targetRowIndex]] = [
-        newRows[targetRowIndex],
-        newRows[currentRowIndex],
-      ];
-      return newRows;
-    });
+    if (!currentRow) return;
+
+    // Update server
+    let data = await swapTask(currentRow, "down");
+
+    // Update rows with new information
+    setRows(data);
   };
 
   const handleClick = () => {
@@ -146,7 +154,7 @@ export default function TasksTable(props: Props) {
   const { data, status, isLoading } = useQuery("tasks", () =>
     getAllTasksForUser(user.id),
   );
-
+  console.log("from client:", rows);
   useEffect(() => {
     if (data) {
       setRows(data);
@@ -171,6 +179,8 @@ export default function TasksTable(props: Props) {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
+    const row = rows.find((item) => item.id === id);
+    if (row) deleteTask(row);
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -194,10 +204,10 @@ export default function TasksTable(props: Props) {
   const processRowUpdate = (newRow: GridRowModel) => {
     // Couple of values we need to send the server about our new row
     newRow.userId = user.id;
-    newRow.index = rows.findIndex((item) => item.id === newRow.id);
+    // newRow.index = rows.findIndex((item) => item.id === newRow.id);
 
     updateTask(newRow);
-    console.log("newRow: ", newRow);
+    // console.log("newRow: ", newRow);
     // console.log("process ID:", newRow.id);
     // console.log("nameRow", newRow.name);
     const updatedRow = { ...newRow, isNew: false };
@@ -320,7 +330,15 @@ export default function TasksTable(props: Props) {
             toolbar: EditToolbar,
           }}
           slotProps={{
-            toolbar: { setRows, setRowModesModel, currentRowId, rows },
+            toolbar: {
+              setRows,
+              setCurrentRowId,
+              setRowModesModel,
+              currentRowId,
+              rows,
+              // swapTaskMutation,
+              user,
+            },
           }}
         />
       </Box>

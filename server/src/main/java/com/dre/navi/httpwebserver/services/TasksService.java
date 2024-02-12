@@ -37,11 +37,8 @@ public class TasksService
         if (isNewTask)
         {
             addNewTask(task);
-            System.out.println("This is a new row");
             return;
         }
-//        if (!tasks.contains(task.getId())){
-//        }
 
         // This is the actual updateTask
         db.updateTask(task);
@@ -50,6 +47,8 @@ public class TasksService
 
     public void addNewTask(Task task) throws SQLException
     {
+        List<Task> tasks = db.selectAllFromTasksForUser(task.getUserId());
+        task.setIndex(tasks.size() );
         String taskId = UUID.randomUUID().toString();
         task.setId(taskId);
         db.addTask(task);
@@ -60,12 +59,12 @@ public class TasksService
         db.deleteTask(task.getId());
     }
 
-    // This is probably the most complicated part of the application
     // We need to swap entries based on their indexes the only problem is
     // that there could be gaps in the indexes. So we need to find the next
     // closest and swap with that one
-    public void swapOrderForTasks(Task task, String direction) throws SQLException
+    public List<Task> swapOrderForTasks(Task task, String direction) throws SQLException
     {
+        System.out.println("swapping order service");
         // Get all tasks for the user. This list is in the order we want it just has gaps in index
         List<Task> tasks = db.selectAllFromTasksForUser(task.getUserId());
         //  Find the index of the current tasks index
@@ -79,22 +78,37 @@ public class TasksService
             }
         }
         // Guard clause
-        if (currentTaskIndex == -1) return;
+        if (currentTaskIndex == -1) return tasks;
 
         // In the case of direction up
         if (Objects.equals(direction, "up"))
         {
-            if (currentTaskIndex == 0) return; // Just to check if we are on the edge of the list
+            if (currentTaskIndex == 0) return tasks; // Just to check if we are on the edge of the list
             // Get the first index
             int indexOne = task.getIndex();
             // Get the second index
             int indexTwo = tasks.get(currentTaskIndex - 1).getIndex();
+            System.out.println("indexOne:" +indexOne + task.getId());
+            System.out.println("indexTwo:" +indexTwo);
             db.swapOrderForTasks(indexOne, indexTwo);
-            return;
+            return db.selectAllFromTasksForUser(task.getUserId());
+        }
+
+        if (Objects.equals(direction, "down"))
+        {
+            if (currentTaskIndex == tasks.size() -1) return tasks; // Just to check if we are on the edge of the list
+            // Get the first index
+            int indexOne = task.getIndex();
+            // Get the second index
+            int indexTwo = tasks.get(currentTaskIndex + 1).getIndex();
+            System.out.println("indexOne:" +indexOne + task.getId());
+            System.out.println("indexTwo:" +indexTwo);
+            db.swapOrderForTasks(indexOne, indexTwo);
+            return db.selectAllFromTasksForUser(task.getUserId());
         }
 
 
-//        db.swapOrderForTasks(indexOne, indexTwo);
+        return tasks;
     }
 
 }
