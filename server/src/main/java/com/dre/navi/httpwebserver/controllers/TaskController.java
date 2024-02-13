@@ -30,25 +30,23 @@ public class TaskController
         return "Recieved row/task" + task.getIndex();
     }
     @PostMapping("/tasks/add")
-    public String addTaskForUser(@RequestBody Task task) throws SQLException
+    public List<Task> addTaskForUser(@RequestBody Task task) throws SQLException
     {
-        taskService.addNewTask(task);
         System.out.println("Adding task");
-        return "Adding task" + task.getId();
+       return taskService.addNewTask(task);
     }
 
     @PostMapping("/tasks/delete")
-    public String deleteTask(@RequestBody Task task) throws SQLException
+    public List<Task> deleteTask(@RequestBody Task task) throws SQLException
     {
-        taskService.deleteTask(task);
         System.out.println("deleting task:" + task.getName());
-        return "Recieved row/task" + task.getIndex();
+        return taskService.deleteTask(task);
+
     }
 
     @PostMapping("/tasks/swap")
     public List<Task> swapTasksOrder(@RequestBody Task task, @RequestParam String direction) throws SQLException
     {
-        System.out.println("swapping");
         return taskService.swapOrderForTasks(task, direction);
 
 

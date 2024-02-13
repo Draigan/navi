@@ -1,10 +1,11 @@
-import * as React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import TabContext from "@mui/lab/TabContext";
 import { TabPanel } from "@mui/lab";
 import TasksTable from "./TasksTable";
+import { useState } from "react";
+import MorningRoutineTable from "./MorningRoutineTable";
 
 type Props = {
   user: { userName: string; id: string };
@@ -12,15 +13,15 @@ type Props = {
 
 export default function TabNavigator(props: Props) {
   const { user } = props;
-  const [value, setValue] = React.useState("one");
-
+  const [value, setValue] = useState("one");
+  const [points, setPoints] = useState(0);
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-
   return (
     <>
       {user.userName}
+      {points}
       <Box
         sx={{
           width: "100%",
@@ -44,9 +45,15 @@ export default function TabNavigator(props: Props) {
             <Tab value="three" label="Chores" />
           </Tabs>
           <TabPanel value="one">
-            <TasksTable user={user} />
+            <MorningRoutineTable
+              user={user}
+              points={points}
+              setPoints={setPoints}
+            />
           </TabPanel>
-          <TabPanel value="two">TWo</TabPanel>
+          <TabPanel value="two">
+            <TasksTable user={user} points={points} setPoints={setPoints} />
+          </TabPanel>
           <TabPanel value="three">Item Three</TabPanel>
         </TabContext>
       </Box>

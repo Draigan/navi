@@ -70,6 +70,7 @@ export async function deleteTask(row: GridRowModel) {
       row,
     );
     console.log("Server:", response.data);
+    return response.data;
   } catch (error) {
     console.error("Error:", error);
     throw error; // Rethrow the error to be caught by the caller if needed
@@ -94,6 +95,78 @@ export async function addTask(row: GridRowModel) {
   try {
     const response = await Axios.post("http://localhost:9090/tasks/add", row);
     console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function getAllMorningRoutinesForUser(userId: string) {
+  try {
+    const response = await Axios.get(
+      `http://localhost:9090/morningroutines/user?user=${userId}`,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function addMorningRoutine(row: GridRowModel) {
+  try {
+    const response = await Axios.post(
+      "http://localhost:9090/morningroutines/add",
+      row,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function updateMorningRoutine(row: GridRowModel) {
+  console.log("Client: row: ", row);
+  try {
+    const response = await Axios.post(
+      "http://localhost:9090/morningroutines/update",
+      row,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function deleteMorningRoutine(row: GridRowModel) {
+  console.log("Client: row: ", row);
+  try {
+    const response = await Axios.post(
+      "http://localhost:9090/morningroutines/delete",
+      row,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function swapMorningRoutine(row: GridRowModel, direction: string) {
+  try {
+    const response = await Axios.post(
+      `http://localhost:9090/morningroutines/swap?direction=${direction}`,
+      row,
+    );
+    // console.log("Server:", response.data);
+    return response.data;
   } catch (error) {
     console.error("Error:", error);
     throw error; // Rethrow the error to be caught by the caller if needed

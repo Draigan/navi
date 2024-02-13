@@ -21,11 +21,11 @@ import { randomId } from "@mui/x-data-grid-generator";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import {
-  addTask,
-  deleteTask,
-  getAllTasksForUser,
-  swapTask,
-  updateTask,
+  addMorningRoutine,
+  deleteMorningRoutine,
+  getAllMorningRoutinesForUser,
+  swapMorningRoutine,
+  updateMorningRoutine,
 } from "../utils/axiosRequests";
 import { useQuery } from "react-query";
 import { CheckBox } from "./CheckBox";
@@ -46,24 +46,11 @@ interface EditToolbarProps {
   ) => void;
   rows: GridRowModel;
   currentRowId: string;
-  swapTaskMutation: {
-    mutate: (variables: {
-      row: GridRowModel;
-      direction: string;
-    }) => Promise<string>;
-  };
   setPoints: (number: number) => void;
 }
 
 function EditToolbar(props: EditToolbarProps) {
-  const {
-    user,
-    setRows,
-    setRowModesModel,
-    currentRowId,
-    rows,
-    // swapTaskMutation,
-  } = props;
+  const { user, setRows, setRowModesModel, currentRowId, rows } = props;
   const handleUpArrowClick = async () => {
     //Guard clause
     if (currentRowId === undefined) return;
@@ -79,7 +66,7 @@ function EditToolbar(props: EditToolbarProps) {
     if (!currentRow) return;
 
     // Update server
-    let data = await swapTask(currentRow, "up");
+    let data = await swapMorningRoutine(currentRow, "up");
 
     // Update rows with new information
     setRows(data);
@@ -96,9 +83,8 @@ function EditToolbar(props: EditToolbarProps) {
       (row: GridRowModel) => row.id === currentRowId,
     );
     if (!currentRow) return;
-
     // Update server
-    let data = await swapTask(currentRow, "down");
+    let data = await swapMorningRoutine(currentRow, "down");
 
     // Update rows with new information
     setRows(data);
@@ -106,8 +92,8 @@ function EditToolbar(props: EditToolbarProps) {
 
   const handleClick = async () => {
     const id = randomId();
-    // Add a task and fetch from the server the new rows config
-    const data = await addTask({
+    // Add a routine and fetch from the server the new rows config
+    const data = await addMorningRoutine({
       id: id,
       name: "",
       points: 0,
@@ -154,13 +140,13 @@ type Props = {
   setPoints: (number: number) => void;
 };
 
-export default function TasksTable(props: Props) {
+export default function MorningRoutinesTable(props: Props) {
   const { user, setPoints } = props;
   const [rows, setRows] = useState(initialRows);
   const [currentRowId, setCurrentRowId] = useState();
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-  const { data, status, isLoading } = useQuery("tasks", () =>
-    getAllTasksForUser(user.id),
+  const { data, status, isLoading } = useQuery("routines", () =>
+    getAllMorningRoutinesForUser(user.id),
   );
   console.log("from client:", rows);
 
@@ -169,14 +155,6 @@ export default function TasksTable(props: Props) {
       setRows(data);
     }
   }, [isLoading]);
-
-  // useEffect(() => {
-  //   let points = 0;
-  //   rows.forEach((row) => {
-  //     points += row.points;
-  //   });
-  //   setPoints(points);
-  // }, [rows]);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -197,7 +175,7 @@ export default function TasksTable(props: Props) {
 
   const handleDeleteClick = (id: GridRowId) => () => {
     const row = rows.find((item) => item.id === id);
-    if (row) deleteTask(row);
+    if (row) deleteMorningRoutine(row);
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -216,7 +194,7 @@ export default function TasksTable(props: Props) {
   //     setRows(rows.filter((row) => row.id !== id));
   //   }
   // };
-
+  //
   function handleRowClick(params: { row: GridRowModel }) {
     const rowId = params.row.id;
     setCurrentRowId(rowId);
@@ -225,7 +203,7 @@ export default function TasksTable(props: Props) {
     // Couple of values we need to send the server about our new row
     newRow.userId = user.id;
 
-    updateTask(newRow);
+    updateMorningRoutine(newRow);
     const updatedRow = { ...newRow, isNew: false };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
@@ -236,16 +214,11 @@ export default function TasksTable(props: Props) {
   };
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: "Daily Task", width: 180, editable: true },
     {
-      field: "points",
-      headerName: "Pnts",
-      type: "number",
-      width: 60,
-      align: "left",
-      headerAlign: "left",
+      field: "name",
+      headerName: "Routine Item",
+      width: 180,
       editable: true,
-      sortable: false,
     },
     {
       field: "actions",
@@ -372,7 +345,6 @@ export default function TasksTable(props: Props) {
               setRowModesModel,
               currentRowId,
               rows,
-              // swapTaskMutation,
               isLoading,
               user,
             },

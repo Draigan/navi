@@ -1,12 +1,12 @@
 package com.dre.navi.sql;
 
+import com.dre.navi.httpwebserver.model.MorningRoutine;
 import com.dre.navi.httpwebserver.model.Task;
 import com.dre.navi.httpwebserver.model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 public class PostgresJDBC
@@ -186,6 +186,7 @@ public class PostgresJDBC
 
     public void swapOrderForTasks(int indexOne, int indexTwo) throws SQLException
     {
+        System.out.println("Current: " + indexOne + " Target: " + indexTwo);
         PreparedStatement ps = connection.prepareStatement(
                 "update tasks set index_order = " +
                         "case " +
@@ -195,7 +196,7 @@ public class PostgresJDBC
                         "where index_order in (?,?)");
         ps.setInt(1, indexOne);
         ps.setInt(2, indexTwo);
-        ps.setInt(3,indexTwo);
+        ps.setInt(3, indexTwo);
         ps.setInt(4, indexOne);
         ps.setInt(5, indexOne);
         ps.setInt(6, indexTwo);
@@ -213,4 +214,47 @@ public class PostgresJDBC
         ps.close();
     }
 
+    //
+    // Morning Routines
+    //
+    public List<MorningRoutine> selectAllFromMorningRoutinesForUser(String userId) throws SQLException
+    {
+        List<MorningRoutine> morningRoutines = new ArrayList<>();
+        PreparedStatement ps = connection.prepareStatement("select * from morningroutines where user_id = ? order by index_order asc");
+        ps.setString(1, userId);
+
+        // Execute a SELECT query
+        ResultSet rs = ps.executeQuery();
+
+        // Process the result set
+        while (rs.next())
+        {
+            // Retrieve data from the result set
+            String user_id = rs.getString("user_id");
+            String morningRoutine_id = rs.getString("routine_id");
+            String name = rs.getString("name");
+            int index_order = rs.getInt("index_order");
+
+            morningRoutines.add(new MorningRoutine(name, user_id, index_order, morningRoutine_id));
+        }
+
+        // Close resources
+        rs.close();
+        ps.close();
+        return morningRoutines;
+    }
+    public void addMorningRoutine(MorningRoutine routine) throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("insert into morningroutine (user_id, routine_id, name,  index_order) values (?, ?, ?, ? )");
+        ps.setString(1, routine.getUserId());
+        ps.setString(2, routine.getId());
+        ps.setString(3, routine.getName());
+        ps.setInt(5, routine.getIndex());
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
 }
