@@ -6,6 +6,7 @@ import { TabPanel } from "@mui/lab";
 import TasksTable from "./TasksTable";
 import { useState } from "react";
 import MorningRoutineTable from "./MorningRoutineTable";
+import ChoresTable from "./ChoresTable";
 
 type Props = {
   user: { userName: string; id: string };
@@ -54,7 +55,9 @@ export default function TabNavigator(props: Props) {
           <TabPanel value="two">
             <TasksTable user={user} points={points} setPoints={setPoints} />
           </TabPanel>
-          <TabPanel value="three">Item Three</TabPanel>
+          <TabPanel value="three">
+            <ChoresTable user={user} points={points} setPoints={setPoints} />
+          </TabPanel>
         </TabContext>
       </Box>
     </>

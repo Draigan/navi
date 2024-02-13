@@ -145,7 +145,7 @@ export default function ChoresTable(props: Props) {
   const [rows, setRows] = useState(initialRows);
   const [currentRowId, setCurrentRowId] = useState();
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-  const { data, status, isLoading } = useQuery("routines", () =>
+  const { data, status, isLoading } = useQuery("chores", () =>
     getAllChoresForUser(user.id),
   );
   console.log("from client:", rows);

@@ -172,3 +172,75 @@ export async function swapMorningRoutine(row: GridRowModel, direction: string) {
     throw error; // Rethrow the error to be caught by the caller if needed
   }
 }
+
+//
+// Chores
+//
+
+export async function getAllChoresForUser(userId: string) {
+  try {
+    const response = await Axios.get(
+      `http://localhost:9090/chores/user?user=${userId}`,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function addChore(row: GridRowModel) {
+  try {
+    const response = await Axios.post("http://localhost:9090/chores/add", row);
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function updateChore(row: GridRowModel) {
+  console.log("Client: row: ", row);
+  try {
+    const response = await Axios.post(
+      "http://localhost:9090/chores/update",
+      row,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function deleteChore(row: GridRowModel) {
+  console.log("Client: row: ", row);
+  try {
+    const response = await Axios.post(
+      "http://localhost:9090/chores/delete",
+      row,
+    );
+    console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
+
+export async function swapChore(row: GridRowModel, direction: string) {
+  try {
+    const response = await Axios.post(
+      `http://localhost:9090/chores/swap?direction=${direction}`,
+      row,
+    );
+    // console.log("Server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Rethrow the error to be caught by the caller if needed
+  }
+}
