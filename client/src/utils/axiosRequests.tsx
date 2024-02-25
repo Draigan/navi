@@ -177,11 +177,12 @@ export async function swapMorningRoutine(row: GridRowModel, direction: string) {
 // Chores
 //
 
-export async function getAllChoresForUser(userId: string) {
+export async function getAllChoresForUser(userId: string, day: string) {
   try {
     const response = await Axios.get(
-      `http://localhost:9090/chores/user?user=${userId}`,
+      `http://localhost:9090/chores/user?user=${userId}&day=${day}`,
     );
+    console.log("DAY FROM REQUEST:", day);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -193,6 +194,7 @@ export async function getAllChoresForUser(userId: string) {
 export async function addChore(row: GridRowModel) {
   try {
     const response = await Axios.post("http://localhost:9090/chores/add", row);
+    console.log("DAY FROM REQUEST:", row.day);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {

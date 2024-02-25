@@ -15,7 +15,6 @@ public class TaskController
     @Autowired
     private TasksService taskService;
 
-
     @GetMapping("/tasks/user")
     public List<Task> getAllTasksForUser(@RequestParam String user) throws SQLException
     {

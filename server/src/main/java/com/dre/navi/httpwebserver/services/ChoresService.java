@@ -1,6 +1,6 @@
 package com.dre.navi.httpwebserver.services;
 
-import com.dre.navi.httpwebserver.model.MorningRoutine;
+import com.dre.navi.httpwebserver.model.Chore;
 import com.dre.navi.sql.PostgresJDBC;
 import org.springframework.stereotype.Service;
 
@@ -9,41 +9,42 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class MorningRoutineService
+public class ChoresService
 {
     PostgresJDBC db = PostgresJDBC.getInstance();
 
-    public List<MorningRoutine> getAllMorningRoutinesForUser(String userId) throws SQLException
+    public List<Chore> getAllChoresForUser(String userId, String day) throws SQLException
     {
-        return db.selectAllFromMorningRoutinesForUser(userId);
+        return db.selectAllFromChoresForUser(userId, day);
     }
 
-    public List<MorningRoutine> addMorningRoutine(MorningRoutine choresRoutine) throws SQLException
+    public List<Chore> addChore(Chore choresRoutine) throws SQLException
     {
-        List<MorningRoutine> choresRoutines = db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+        List<Chore> choresRoutines = db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
         int size = choresRoutines.size();
         choresRoutine.setIndex(choresRoutines.size());
-        db.addMorningRoutine(choresRoutine);
-        return db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+        db.addChore(choresRoutine);
+        System.out.println(choresRoutine.getDay());
+        return db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
     }
 
-    public List<MorningRoutine> updateMorningRoutine(MorningRoutine choresRoutine) throws SQLException
+    public List<Chore> updateChore(Chore choresRoutine) throws SQLException
     {
-        db.updateMorningRoutine(choresRoutine);
-        return db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+        db.updateChore(choresRoutine);
+        return db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
     }
 
-    public List<MorningRoutine> deleteMorningRoutine(MorningRoutine choresRoutine) throws SQLException
+    public List<Chore> deleteChore(Chore choresRoutine) throws SQLException
     {
-        db.deleteMorningRoutine(choresRoutine.getId());
+        db.deleteChore(choresRoutine.getId());
         System.out.println("Morning ROutine delte");
-        return db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+        return db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
     }
 
-    public List<MorningRoutine> swapOrderForMorningRoutine(MorningRoutine choresRoutine, String direction) throws SQLException
+    public List<Chore> swapOrderForChore(Chore choresRoutine, String direction) throws SQLException
     {
         // Get all tasks for the user. This list is in the order we want it just has gaps in index
-        List<MorningRoutine> choresRoutines = db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+        List<Chore> choresRoutines = db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
         //  Find the index of the current tasks index
         int currentTaskIndex = -1;
         for (int i = 0; i < choresRoutines.size(); i++)
@@ -65,8 +66,8 @@ public class MorningRoutineService
             int indexOne = choresRoutine.getIndex();
             // Get the second index
             int indexTwo = choresRoutines.get(currentTaskIndex - 1).getIndex();
-            db.swapOrderForMorningRoutines(indexOne, indexTwo);
-            return db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+            db.swapOrderForChores(indexOne, indexTwo);
+            return db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
         }
 
         if (Objects.equals(direction, "down"))
@@ -77,8 +78,8 @@ public class MorningRoutineService
             int indexOne = choresRoutine.getIndex();
             // Get the second index
             int indexTwo = choresRoutines.get(currentTaskIndex + 1).getIndex();
-            db.swapOrderForMorningRoutines(indexOne, indexTwo);
-            return db.selectAllFromMorningRoutinesForUser(choresRoutine.getUserId());
+            db.swapOrderForChores(indexOne, indexTwo);
+            return db.selectAllFromChoresForUser(choresRoutine.getUserId(), choresRoutine.getDay());
         }
 
 

@@ -3,7 +3,7 @@ import { postNewUser } from "../utils/axiosRequests";
 import { Button, TextField } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 
-export default function ChooseUser() {
+export default function AddUser() {
   const [inputValue, setInputValue] = useState("");
   const [invalidInput, setInvalidInput] = useState(false);
   const queryClient = useQueryClient();

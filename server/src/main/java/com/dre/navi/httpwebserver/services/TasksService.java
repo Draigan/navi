@@ -22,7 +22,6 @@ public class TasksService
     public void updateTask(Task task) throws SQLException
     {
         db.updateTask(task);
-
     }
 
     public List<Task> addNewTask(Task task) throws SQLException

@@ -19,7 +19,7 @@ import {
 } from "@mui/x-data-grid";
 import { randomId } from "@mui/x-data-grid-generator";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   addChore,
   deleteChore,
@@ -29,6 +29,8 @@ import {
 } from "../utils/axiosRequests";
 import { useQuery } from "react-query";
 import { CheckBox } from "./CheckBox";
+import SelectDay from "./SelectDay";
+import getDay from "../utils/getDay";
 
 const initialRows: GridRowsProp = [
   {
@@ -46,11 +48,13 @@ interface EditToolbarProps {
   ) => void;
   rows: GridRowModel;
   currentRowId: string;
-  setPoints: (number: number) => void;
+  day: string;
+  setDay: (param: string) => void;
 }
 
 function EditToolbar(props: EditToolbarProps) {
-  const { user, setRows, setRowModesModel, currentRowId, rows } = props;
+  const { user, setRows, setRowModesModel, currentRowId, rows, day, setDay } =
+    props;
   const handleUpArrowClick = async () => {
     //Guard clause
     if (currentRowId === undefined) return;
@@ -93,14 +97,17 @@ function EditToolbar(props: EditToolbarProps) {
   const handleClick = async () => {
     const id = randomId();
     // Add a routine and fetch from the server the new rows config
+
     const data = await addChore({
       id: id,
       name: "",
+      day: day,
       points: 0,
       index: 0,
       userId: user.id,
     });
-
+    console.log("from add", data);
+    if (data.length === 0) return;
     setRows(data);
     setRowModesModel((oldModel) => ({
       ...oldModel,
@@ -114,7 +121,7 @@ function EditToolbar(props: EditToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
+        Add
       </Button>
       <Button
         color="primary"
@@ -130,31 +137,66 @@ function EditToolbar(props: EditToolbarProps) {
       >
         Down
       </Button>
+      <Button color="primary" onClick={handleDownArrowClick}>
+        <SelectDay setDay={setDay} />
+      </Button>
     </GridToolbarContainer>
   );
 }
 
 type Props = {
   user: { userName: string; id: string };
-  points: number;
-  setPoints: (number: number) => void;
+  setUser: Dispatch<SetStateAction<Partial<User>>>;
+};
+
+type User = {
+  userName: string;
+  id: string;
+  routinesRequired: null | number;
+  pointsRequired: null | number;
+  choresRequired: null | number;
+  routinesChecked: null | number;
+  pointsChecked: null | number;
+  choresChecked: null | number;
 };
 
 export default function ChoresTable(props: Props) {
-  const { user, setPoints } = props;
+  const { user, setUser } = props;
   const [rows, setRows] = useState(initialRows);
   const [currentRowId, setCurrentRowId] = useState();
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-  const { data, status, isLoading } = useQuery("chores", () =>
-    getAllChoresForUser(user.id),
+  const [day, setDay] = useState(getDay());
+  const { data, status, isLoading } = useQuery(["chores"], () =>
+    getAllChoresForUser(user.id, day),
   );
-  console.log("from client:", rows);
+
+  // Set the required length for the user chores jackpot
+  useEffect(() => {
+    setUser((prev) => ({ ...prev, choresRequired: rows.length }));
+  }, [rows]);
+
+  useEffect(() => {
+    const getChores = async () => {
+      console.log("day");
+      const data = await getAllChoresForUser(user.id, day);
+      setRows(data);
+      setUser((prev) => ({ ...prev, choresRequired: data.length }));
+    };
+    getChores();
+    setUser((prev) => ({ ...prev, choresChecked: 0 }));
+  }, [day]);
 
   useEffect(() => {
     if (data) {
       setRows(data);
     }
-  }, [isLoading]);
+  }, [data]);
+
+  // Reset the points because the cheeckbox components are going to populate the points
+  // and we dont want them to compound
+  useEffect(() => {
+    setUser((prev) => ({ ...prev, choresChecked: 0 }));
+  }, []);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -179,22 +221,6 @@ export default function ChoresTable(props: Props) {
     setRows(rows.filter((row) => row.id !== id));
   };
 
-  // const handleCancelClick = (id: GridRowId) => async () => {
-  //   const currentRow = rows.find((row: GridRowModel) => row.id === id);
-  //   if (!currentRow) return console.log("row not found");
-  //   let data = await deleteTask(currentRow);
-  //   setRows(data);
-  //   setRowModesModel({
-  //     ...rowModesModel,
-  //     [id]: { mode: GridRowModes.View, ignoreModifications: true },
-  //   });
-  //
-  //   const editedRow = rows.find((row) => row.id === id);
-  //   if (editedRow!.isNew) {
-  //     setRows(rows.filter((row) => row.id !== id));
-  //   }
-  // };
-  //
   function handleRowClick(params: { row: GridRowModel }) {
     const rowId = params.row.id;
     setCurrentRowId(rowId);
@@ -236,7 +262,8 @@ export default function ChoresTable(props: Props) {
                 <CheckBox
                   id={id}
                   pointValue={rows?.find((row) => row.id === id)?.points}
-                  setPoints={setPoints}
+                  type="chore"
+                  setUser={setUser}
                 />
               }
               label="Save"
@@ -275,7 +302,8 @@ export default function ChoresTable(props: Props) {
               <CheckBox
                 id={id}
                 pointValue={rows?.find((row) => row.id === id)?.points}
-                setPoints={setPoints}
+                type="chore"
+                setUser={setUser}
               />
             }
             label="Save"
@@ -340,13 +368,14 @@ export default function ChoresTable(props: Props) {
           slotProps={{
             toolbar: {
               setRows,
-              setPoints,
               setCurrentRowId,
               setRowModesModel,
               currentRowId,
               rows,
               isLoading,
               user,
+              setDay,
+              day,
             },
           }}
         />

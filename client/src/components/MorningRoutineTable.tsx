@@ -19,7 +19,7 @@ import {
 } from "@mui/x-data-grid";
 import { randomId } from "@mui/x-data-grid-generator";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   addMorningRoutine,
   deleteMorningRoutine,
@@ -46,7 +46,6 @@ interface EditToolbarProps {
   ) => void;
   rows: GridRowModel;
   currentRowId: string;
-  setPoints: (number: number) => void;
 }
 
 function EditToolbar(props: EditToolbarProps) {
@@ -114,7 +113,7 @@ function EditToolbar(props: EditToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
+        Add
       </Button>
       <Button
         color="primary"
@@ -136,25 +135,47 @@ function EditToolbar(props: EditToolbarProps) {
 
 type Props = {
   user: { userName: string; id: string };
-  points: number;
-  setPoints: (number: number) => void;
+  setUser: Dispatch<SetStateAction<Partial<User>>>;
 };
 
+type User = {
+  userName: string;
+  id: string;
+  routinesRequired: null | number;
+  pointsRequired: null | number;
+  choresRequired: null | number;
+  routinesChecked: null | number;
+  pointsChecked: null | number;
+  choresChecked: null | number;
+};
 export default function MorningRoutinesTable(props: Props) {
-  const { user, setPoints } = props;
+  const { user, setUser } = props;
   const [rows, setRows] = useState(initialRows);
   const [currentRowId, setCurrentRowId] = useState();
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const { data, status, isLoading } = useQuery("routines", () =>
     getAllMorningRoutinesForUser(user.id),
   );
-  console.log("from client:", rows);
 
+  // Set the required length for the user morning routines jackpot
+  useEffect(() => {
+    setUser((prev) => ({ ...prev, routinesRequired: rows.length }));
+  }, [rows]);
   useEffect(() => {
     if (data) {
       setRows(data);
+      setUser({
+        ...user,
+        routinesRequired: data.length,
+      });
     }
-  }, [isLoading]);
+  }, [data]);
+
+  // Reset the points because the cheeckbox components are going to populate the points
+  // and we dont want them to compound
+  useEffect(() => {
+    setUser((prev) => ({ ...prev, routinesChecked: 0 }));
+  }, []);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -174,38 +195,25 @@ export default function MorningRoutinesTable(props: Props) {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
+    console.log("From delete");
     const row = rows.find((item) => item.id === id);
     if (row) deleteMorningRoutine(row);
-    setRows(rows.filter((row) => row.id !== id));
+    getAllMorningRoutinesForUser(user.id).then((data) => setRows(data));
+    // setRows(rows.filter((row) => row.id !== id));
   };
 
-  // const handleCancelClick = (id: GridRowId) => async () => {
-  //   const currentRow = rows.find((row: GridRowModel) => row.id === id);
-  //   if (!currentRow) return console.log("row not found");
-  //   let data = await deleteTask(currentRow);
-  //   setRows(data);
-  //   setRowModesModel({
-  //     ...rowModesModel,
-  //     [id]: { mode: GridRowModes.View, ignoreModifications: true },
-  //   });
-  //
-  //   const editedRow = rows.find((row) => row.id === id);
-  //   if (editedRow!.isNew) {
-  //     setRows(rows.filter((row) => row.id !== id));
-  //   }
-  // };
-  //
   function handleRowClick(params: { row: GridRowModel }) {
     const rowId = params.row.id;
     setCurrentRowId(rowId);
   }
-  const processRowUpdate = (newRow: GridRowModel) => {
-    // Couple of values we need to send the server about our new row
+  const processRowUpdate = async (newRow: GridRowModel) => {
+    // Values we need to send the server about our new row
     newRow.userId = user.id;
 
-    updateMorningRoutine(newRow);
+    const data = await updateMorningRoutine(newRow);
+    console.log("data before process", data);
+    setRows(data);
     const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
 
@@ -236,7 +244,8 @@ export default function MorningRoutinesTable(props: Props) {
                 <CheckBox
                   id={id}
                   pointValue={rows?.find((row) => row.id === id)?.points}
-                  setPoints={setPoints}
+                  setUser={setUser}
+                  type="morning"
                 />
               }
               label="Save"
@@ -262,7 +271,12 @@ export default function MorningRoutinesTable(props: Props) {
               className="textPrimary"
               onClick={(event) => {
                 event.stopPropagation();
-                handleSaveClick(id);
+                const row = rows.find((item) => item.id === id);
+                if (row) deleteMorningRoutine(row);
+                getAllMorningRoutinesForUser(user.id).then((data) =>
+                  setRows(data),
+                );
+                console.log("dete click");
               }}
               color="inherit"
             />,
@@ -275,7 +289,8 @@ export default function MorningRoutinesTable(props: Props) {
               <CheckBox
                 id={id}
                 pointValue={rows?.find((row) => row.id === id)?.points}
-                setPoints={setPoints}
+                type="morning"
+                setUser={setUser}
               />
             }
             label="Save"
@@ -340,7 +355,6 @@ export default function MorningRoutinesTable(props: Props) {
           slotProps={{
             toolbar: {
               setRows,
-              setPoints,
               setCurrentRowId,
               setRowModesModel,
               currentRowId,

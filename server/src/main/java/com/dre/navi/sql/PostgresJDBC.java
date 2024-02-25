@@ -1,5 +1,6 @@
 package com.dre.navi.sql;
 
+import com.dre.navi.httpwebserver.model.Chore;
 import com.dre.navi.httpwebserver.model.MorningRoutine;
 import com.dre.navi.httpwebserver.model.Task;
 import com.dre.navi.httpwebserver.model.User;
@@ -204,12 +205,6 @@ public class PostgresJDBC
         // Execute INSERT
         ps.executeUpdate();
 
-//        update tasks set index_order =
-//            case when index_order = 2 then 1
-//            when index_order = 1 then 2
-//            end
-//                    where index_order in (2,1) ;
-
         // Close resources
         ps.close();
     }
@@ -219,7 +214,7 @@ public class PostgresJDBC
     //
     public List<MorningRoutine> selectAllFromMorningRoutinesForUser(String userId) throws SQLException
     {
-        List<MorningRoutine> morningRoutines = new ArrayList<>();
+        List<MorningRoutine> choresRoutines = new ArrayList<>();
         PreparedStatement ps = connection.prepareStatement("select * from morningroutines where user_id = ? order by index_order asc");
         ps.setString(1, userId);
 
@@ -235,21 +230,174 @@ public class PostgresJDBC
             String name = rs.getString("name");
             int index_order = rs.getInt("index_order");
 
-            morningRoutines.add(new MorningRoutine(name, user_id, index_order, morningRoutine_id));
+            choresRoutines.add(new MorningRoutine(name, user_id, index_order, morningRoutine_id));
         }
 
         // Close resources
         rs.close();
         ps.close();
-        return morningRoutines;
+        return choresRoutines;
     }
+
     public void addMorningRoutine(MorningRoutine routine) throws SQLException
     {
-        PreparedStatement ps = connection.prepareStatement("insert into morningroutine (user_id, routine_id, name,  index_order) values (?, ?, ?, ? )");
+        PreparedStatement ps =
+                connection.prepareStatement("insert into morningroutines (user_id, routine_id, name,  index_order) values (?, ?, ?, ? )");
         ps.setString(1, routine.getUserId());
         ps.setString(2, routine.getId());
         ps.setString(3, routine.getName());
-        ps.setInt(5, routine.getIndex());
+        ps.setInt(4, routine.getIndex());
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+
+    public void updateMorningRoutine(MorningRoutine choresRoutine) throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("update morningroutines set name = ?,  index_order = ? where routine_id = ? ");
+        ps.setString(1, choresRoutine.getName());
+        ps.setInt(2, choresRoutine.getIndex());
+        ps.setString(3, choresRoutine.getId());
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+
+    public void deleteMorningRoutine(String routineId) throws SQLException
+    {
+        System.out.println("Deleting morning routine with id: " + routineId);
+        PreparedStatement ps = connection.prepareStatement("delete from morningroutines where routine_id = ?");
+        ps.setString(1, routineId);
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+
+    public void swapOrderForMorningRoutines(int indexOne, int indexTwo) throws SQLException
+    {
+        System.out.println("Current: " + indexOne + " Target: " + indexTwo);
+        PreparedStatement ps = connection.prepareStatement(
+                "update morningroutines set index_order = " +
+                        "case " +
+                        "when index_order = ? then ? " +
+                        "when index_order = ? then ? " +
+                        "end " +
+                        "where index_order in (?,?)");
+        ps.setInt(1, indexOne);
+        ps.setInt(2, indexTwo);
+        ps.setInt(3, indexTwo);
+        ps.setInt(4, indexOne);
+        ps.setInt(5, indexOne);
+        ps.setInt(6, indexTwo);
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+    
+    //
+    // Chores
+    //
+    public List<Chore> selectAllFromChoresForUser(String userId, String day) throws SQLException
+    {
+        List<Chore> chores = new ArrayList<>();
+        PreparedStatement ps = connection.prepareStatement("select * from chores where user_id = ? and day = ? order by index_order asc");
+        ps.setString(1, userId);
+        ps.setString(2, day);
+
+        // Execute a SELECT query
+        ResultSet rs = ps.executeQuery();
+
+        // Process the result set
+        while (rs.next())
+        {
+            // Retrieve data from the result set
+            String user_id = rs.getString("user_id");
+            String morningRoutine_id = rs.getString("chore_id");
+            String name = rs.getString("name");
+            int index_order = rs.getInt("index_order");
+            String day_routine = rs.getString("day");
+
+            chores.add(new Chore(name, user_id, index_order, morningRoutine_id, day_routine));
+        }
+
+        // Close resources
+        rs.close();
+        ps.close();
+        return chores;
+    }
+
+    public void addChore(Chore chore) throws SQLException
+    {
+        PreparedStatement ps =
+                connection.prepareStatement("insert into chores (user_id, chore_id, name,  index_order, day) values (?, ?, ?, ?, ? )");
+        ps.setString(1, chore.getUserId());
+        ps.setString(2, chore.getId());
+        ps.setString(3, chore.getName());
+        ps.setInt(4, chore.getIndex());
+        ps.setString(5, chore.getDay());
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+
+    public void updateChore(Chore choresRoutine) throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("update chores set name = ?,  index_order = ? where chore_id = ? ");
+        ps.setString(1, choresRoutine.getName());
+        ps.setInt(2, choresRoutine.getIndex());
+        ps.setString(3, choresRoutine.getId());
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+
+    public void deleteChore(String choreId) throws SQLException
+    {
+        System.out.println("Deleting morning chore with id: " + choreId);
+        PreparedStatement ps = connection.prepareStatement("delete from chores where chore_id = ?");
+        ps.setString(1, choreId);
+
+        // Execute INSERT
+        ps.executeUpdate();
+
+        // Close resources
+        ps.close();
+    }
+
+    public void swapOrderForChores(int indexOne, int indexTwo) throws SQLException
+    {
+        System.out.println("Current: " + indexOne + " Target: " + indexTwo);
+        PreparedStatement ps = connection.prepareStatement(
+                "update chores set index_order = " +
+                        "case " +
+                        "when index_order = ? then ? " +
+                        "when index_order = ? then ? " +
+                        "end " +
+                        "where index_order in (?,?)");
+        ps.setInt(1, indexOne);
+        ps.setInt(2, indexTwo);
+        ps.setInt(3, indexTwo);
+        ps.setInt(4, indexOne);
+        ps.setInt(5, indexOne);
+        ps.setInt(6, indexTwo);
 
         // Execute INSERT
         ps.executeUpdate();
@@ -258,3 +406,4 @@ public class PostgresJDBC
         ps.close();
     }
 }
+

@@ -19,7 +19,7 @@ import {
 } from "@mui/x-data-grid";
 import { randomId } from "@mui/x-data-grid-generator";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   addTask,
   deleteTask,
@@ -46,13 +46,6 @@ interface EditToolbarProps {
   ) => void;
   rows: GridRowModel;
   currentRowId: string;
-  swapTaskMutation: {
-    mutate: (variables: {
-      row: GridRowModel;
-      direction: string;
-    }) => Promise<string>;
-  };
-  setPoints: (number: number) => void;
 }
 
 function EditToolbar(props: EditToolbarProps) {
@@ -128,7 +121,7 @@ function EditToolbar(props: EditToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
+        Add
       </Button>
       <Button
         color="primary"
@@ -150,12 +143,21 @@ function EditToolbar(props: EditToolbarProps) {
 
 type Props = {
   user: { userName: string; id: string };
-  points: number;
-  setPoints: (number: number) => void;
+  setUser: Dispatch<SetStateAction<Partial<User>>>;
 };
 
+type User = {
+  userName: string;
+  id: string;
+  routinesRequired: null | number;
+  pointsRequired: null | number;
+  choresRequired: null | number;
+  routinesChecked: null | number;
+  pointsChecked: null | number;
+  choresChecked: null | number;
+};
 export default function TasksTable(props: Props) {
-  const { user, setPoints } = props;
+  const { user, setUser } = props;
   const [rows, setRows] = useState(initialRows);
   const [currentRowId, setCurrentRowId] = useState();
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
@@ -168,15 +170,13 @@ export default function TasksTable(props: Props) {
     if (data) {
       setRows(data);
     }
-  }, [isLoading]);
+  }, [data]);
 
-  // useEffect(() => {
-  //   let points = 0;
-  //   rows.forEach((row) => {
-  //     points += row.points;
-  //   });
-  //   setPoints(points);
-  // }, [rows]);
+  // Reset the points because the cheeckbox components are going to populate the points
+  // and we dont want them to compound
+  useEffect(() => {
+    setUser((prev) => ({ ...prev, pointsChecked: 0 }));
+  }, []);
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -263,7 +263,8 @@ export default function TasksTable(props: Props) {
                 <CheckBox
                   id={id}
                   pointValue={rows?.find((row) => row.id === id)?.points}
-                  setPoints={setPoints}
+                  type={"task"}
+                  setUser={setUser}
                 />
               }
               label="Save"
@@ -302,7 +303,8 @@ export default function TasksTable(props: Props) {
               <CheckBox
                 id={id}
                 pointValue={rows?.find((row) => row.id === id)?.points}
-                setPoints={setPoints}
+                type={"task"}
+                setUser={setUser}
               />
             }
             label="Save"
@@ -367,7 +369,6 @@ export default function TasksTable(props: Props) {
           slotProps={{
             toolbar: {
               setRows,
-              setPoints,
               setCurrentRowId,
               setRowModesModel,
               currentRowId,

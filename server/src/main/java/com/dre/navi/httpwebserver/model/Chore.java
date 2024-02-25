@@ -1,19 +1,21 @@
 package com.dre.navi.httpwebserver.model;
 
-public class MorningRoutine
+public class Chore
 {
 
     private String name;
     private String userId;
     private int index;
     private String id;
+    private String day;
 
-    public MorningRoutine(String name, String userId, int index, String id)
+    public Chore(String name, String userId, int index, String id, String day)
     {
         this.name = name;
         this.userId = userId;
         this.index = index;
         this.id = id;
+        this.day = day;
     }
 
     public String getName()
@@ -56,5 +58,14 @@ public class MorningRoutine
         this.id = id;
     }
 
+    public String getDay()
+    {
+        return day;
+    }
+
+    public void setDay(String day)
+    {
+        this.day = day;
+    }
 
 }

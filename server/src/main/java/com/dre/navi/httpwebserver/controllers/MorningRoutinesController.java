@@ -15,35 +15,31 @@ public class MorningRoutinesController
     private MorningRoutineService morningRoutineService;
 
     @GetMapping("/morningroutines/user")
-    public List<MorningRoutine> getAllTasksForUser(@RequestParam String user) throws SQLException
+    public List<MorningRoutine> getAllRoutineForUser(@RequestParam String user) throws SQLException
     {
         return morningRoutineService.getAllMorningRoutinesForUser(user);
     }
-    @PostMapping("/morningroutine/add")
-    public List<MorningRoutine> addTaskForUser(@RequestBody MorningRoutine morningRoutine) throws SQLException
+    @PostMapping("/morningroutines/add")
+    public List<MorningRoutine> addRoutine(@RequestBody MorningRoutine choresRoutine) throws SQLException
     {
-        System.out.println("Adding task");
-        return morningRoutineService.addMorningRoutine(morningRoutine);
+        System.out.println("Adding routine");
+        return morningRoutineService.addMorningRoutine(choresRoutine);
     }
 
-//    @PostMapping("/tasks/update")
-//    public String getAllTasksForUser(@RequestBody Task task) throws SQLException
-//    {
-//        taskService.updateTask(task);
-//        System.out.println(task.getName());
-//        return "Recieved row/task" + task.getIndex();
-//    }
-//
-//    @PostMapping("/tasks/delete")
-//    public List<Task> deleteTask(@RequestBody Task task) throws SQLException
-//    {
-//        System.out.println("deleting task:" + task.getName());
-//        return taskService.deleteTask(task);
-//    }
-//
-//    @PostMapping("/tasks/swap")
-//    public List<Task> swapTasksOrder(@RequestBody Task task, @RequestParam String direction) throws SQLException
-//    {
-//        return taskService.swapOrderForTasks(task, direction);
-//    }
+    @PostMapping("/morningroutines/update")
+    public List<MorningRoutine> updateRoutine(@RequestBody MorningRoutine choresRoutine) throws SQLException
+    {
+        return morningRoutineService.updateMorningRoutine(choresRoutine);
+    }
+    @PostMapping("/morningroutines/delete")
+    public List<MorningRoutine> deleteMorningRoutine(@RequestBody MorningRoutine choresRoutine) throws SQLException
+    {
+        return morningRoutineService.deleteMorningRoutine(choresRoutine);
+    }
+
+    @PostMapping("/morningroutines/swap")
+    public List<MorningRoutine> swapRoutineOrder(@RequestBody MorningRoutine choresRoutine, @RequestParam String direction) throws SQLException
+    {
+        return morningRoutineService.swapOrderForMorningRoutine(choresRoutine, direction);
+    }
 }
