@@ -32,7 +32,7 @@ public class PostgresJDBC
 
     public void startConnection() throws SQLException
     {
-        String url = "jdbc:postgresql://localhost:5432/navi";
+        String url = "jdbc:postgresql://postgres-container:5432/navi";
         String user = "postgres";
         String password = "dre123";
         try
@@ -56,9 +56,42 @@ public class PostgresJDBC
             throw new RuntimeException(ex);
         }
     }
+    public void createTablesIfNotExists() throws SQLException
+    {
+        // Create tables if they don't exist
+        createTableIfNotExistsUsers();
+        createTableIfNotExistsTasks();
+        createTableIfNotExistsRoutines();
+        createTableIfNotExistsChores();
+    }
+    private void createTableIfNotExistsUsers() throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("create table if not exists users (user_id varchar(255), user_name varchar(255))");
+        ps.executeUpdate();
+        ps.close();
+    }
+    private void createTableIfNotExistsTasks() throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("create table if not exists tasks (task_id varchar(255), user_id varchar(255), name varchar(255), points int, index_order int)");
+        ps.executeUpdate();
+        ps.close();
+    }
+    private void createTableIfNotExistsRoutines() throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("create table if not exists morningroutines (routine_id varchar(255), user_id varchar(255), name varchar(255),  index_order int)");
+        ps.executeUpdate();
+        ps.close();
+    }
+    private void createTableIfNotExistsChores() throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("create table if not exists chores (chore_id varchar(255), user_id varchar(255), name varchar(255), day varchar(255), index_order int)");
+        ps.executeUpdate();
+        ps.close();
+    }
 
     public List<User> selectAllFromUsers() throws SQLException
     {
+        createTableIfNotExistsUsers();
         List<User> users = new ArrayList<>();
         PreparedStatement ps = connection.prepareStatement("select * from users");
 
@@ -84,8 +117,10 @@ public class PostgresJDBC
         return users;
     }
 
+
     public void addUser(String id, String userName) throws SQLException
     {
+        createTableIfNotExistsUsers();
         PreparedStatement ps = connection.prepareStatement("insert into users (user_id, user_name) values (?, ?)");
         ps.setString(1, id);
         ps.setString(2, userName);
@@ -97,8 +132,10 @@ public class PostgresJDBC
         ps.close();
     }
 
+
     public void deleteUser(String id) throws SQLException
     {
+        createTableIfNotExistsUsers();
         System.out.println("Deleting user with id: " + id);
         PreparedStatement ps = connection.prepareStatement("delete from users where user_id = ?");
         ps.setString(1, id);
@@ -305,7 +342,7 @@ public class PostgresJDBC
         // Close resources
         ps.close();
     }
-    
+
     //
     // Chores
     //

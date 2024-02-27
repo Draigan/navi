@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dre123
+      POSTGRES_DB: navi
+
+  app:
+    build: .
+    image: navi:first
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
