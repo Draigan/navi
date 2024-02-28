@@ -21,7 +21,7 @@ type User = {
 };
 
 export default function HamburgerMenu(props: Props) {
-  const { setInUser, setUser, user } = props;
+  const { setInUser, user } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {

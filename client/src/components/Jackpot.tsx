@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Winner } from "../css/winner";
-import spongebow from "../assets/spongerainbow.gif";
+import { Winner } from "./winner";
 import { Typography } from "@mui/material";
 
 const Jackpot = ({

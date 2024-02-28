@@ -1,9 +1,11 @@
 import { GridRowModel } from "@mui/x-data-grid";
 import Axios from "axios";
 
+const URL = "http://18.188.61.139/navi";
+
 export async function postNewUser(userName: string) {
   try {
-    const response = await Axios.post("http://localhost:9090/users/new", {
+    const response = await Axios.post(URL + "/users/new", {
       userName: userName,
     });
     console.log("Server:", response.data);
@@ -15,7 +17,7 @@ export async function postNewUser(userName: string) {
 
 export async function getAllUserNames() {
   try {
-    const response = await Axios.get("http://localhost:9090/users/all");
+    const response = await Axios.get(URL + "/users/all");
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -26,7 +28,7 @@ export async function getAllUserNames() {
 
 export async function deleteUser(id: string) {
   try {
-    const response = await Axios.post("http://localhost:9090/users/delete", {
+    const response = await Axios.post(URL + "/users/delete", {
       id: id,
     });
     console.log("Server:", response.data);
@@ -38,9 +40,7 @@ export async function deleteUser(id: string) {
 
 export async function getAllTasksForUser(userId: string) {
   try {
-    const response = await Axios.get(
-      `http://localhost:9090/tasks/user?user=${userId}`,
-    );
+    const response = await Axios.get(`${URL}/tasks/user?user=${userId}`);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -51,10 +51,7 @@ export async function getAllTasksForUser(userId: string) {
 export async function updateTask(row: GridRowModel) {
   console.log("Client: row: ", row);
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/tasks/update",
-      row,
-    );
+    const response = await Axios.post(URL + "/tasks/update", row);
     console.log("Server:", response.data);
   } catch (error) {
     console.error("Error:", error);
@@ -65,10 +62,7 @@ export async function updateTask(row: GridRowModel) {
 export async function deleteTask(row: GridRowModel) {
   console.log("Client: row: ", row);
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/tasks/delete",
-      row,
-    );
+    const response = await Axios.post(URL + "/tasks/delete", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -80,7 +74,7 @@ export async function deleteTask(row: GridRowModel) {
 export async function swapTask(row: GridRowModel, direction: string) {
   try {
     const response = await Axios.post(
-      `http://localhost:9090/tasks/swap?direction=${direction}`,
+      URL + `/tasks/swap?direction=${direction}`,
       row,
     );
     // console.log("Server:", response.data);
@@ -93,7 +87,7 @@ export async function swapTask(row: GridRowModel, direction: string) {
 
 export async function addTask(row: GridRowModel) {
   try {
-    const response = await Axios.post("http://localhost:9090/tasks/add", row);
+    const response = await Axios.post(URL + "/tasks/add", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -105,7 +99,7 @@ export async function addTask(row: GridRowModel) {
 export async function getAllMorningRoutinesForUser(userId: string) {
   try {
     const response = await Axios.get(
-      `http://localhost:9090/morningroutines/user?user=${userId}`,
+      `${URL}/morningroutines/user?user=${userId}`,
     );
     console.log("Server:", response.data);
     return response.data;
@@ -117,10 +111,7 @@ export async function getAllMorningRoutinesForUser(userId: string) {
 
 export async function addMorningRoutine(row: GridRowModel) {
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/morningroutines/add",
-      row,
-    );
+    const response = await Axios.post(URL + "/morningroutines/add", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -132,10 +123,7 @@ export async function addMorningRoutine(row: GridRowModel) {
 export async function updateMorningRoutine(row: GridRowModel) {
   console.log("Client: row: ", row);
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/morningroutines/update",
-      row,
-    );
+    const response = await Axios.post(URL + "/morningroutines/update", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -147,10 +135,7 @@ export async function updateMorningRoutine(row: GridRowModel) {
 export async function deleteMorningRoutine(row: GridRowModel) {
   console.log("Client: row: ", row);
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/morningroutines/delete",
-      row,
-    );
+    const response = await Axios.post(URL + "/morningroutines/delete", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -162,7 +147,7 @@ export async function deleteMorningRoutine(row: GridRowModel) {
 export async function swapMorningRoutine(row: GridRowModel, direction: string) {
   try {
     const response = await Axios.post(
-      `http://localhost:9090/morningroutines/swap?direction=${direction}`,
+      `${URL}/morningroutines/swap?direction=${direction}`,
       row,
     );
     // console.log("Server:", response.data);
@@ -180,7 +165,7 @@ export async function swapMorningRoutine(row: GridRowModel, direction: string) {
 export async function getAllChoresForUser(userId: string, day: string) {
   try {
     const response = await Axios.get(
-      `http://localhost:9090/chores/user?user=${userId}&day=${day}`,
+      `${URL}/chores/user?user=${userId}&day=${day}`,
     );
     console.log("DAY FROM REQUEST:", day);
     console.log("Server:", response.data);
@@ -193,7 +178,7 @@ export async function getAllChoresForUser(userId: string, day: string) {
 
 export async function addChore(row: GridRowModel) {
   try {
-    const response = await Axios.post("http://localhost:9090/chores/add", row);
+    const response = await Axios.post(URL + "/chores/add", row);
     console.log("DAY FROM REQUEST:", row.day);
     console.log("Server:", response.data);
     return response.data;
@@ -206,10 +191,7 @@ export async function addChore(row: GridRowModel) {
 export async function updateChore(row: GridRowModel) {
   console.log("Client: row: ", row);
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/chores/update",
-      row,
-    );
+    const response = await Axios.post(URL + "/chores/update", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -221,10 +203,7 @@ export async function updateChore(row: GridRowModel) {
 export async function deleteChore(row: GridRowModel) {
   console.log("Client: row: ", row);
   try {
-    const response = await Axios.post(
-      "http://localhost:9090/chores/delete",
-      row,
-    );
+    const response = await Axios.post(URL + "/chores/delete", row);
     console.log("Server:", response.data);
     return response.data;
   } catch (error) {
@@ -236,7 +215,7 @@ export async function deleteChore(row: GridRowModel) {
 export async function swapChore(row: GridRowModel, direction: string) {
   try {
     const response = await Axios.post(
-      `http://localhost:9090/chores/swap?direction=${direction}`,
+      `${URL}/chores/swap?direction=${direction}`,
       row,
     );
     // console.log("Server:", response.data);
