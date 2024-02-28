@@ -24,6 +24,11 @@ public class UserController
         return "Hello";
     }
 
+    @GetMapping("/navi/users")
+    public String hello2()
+    {
+        return "Hello from navi";
+    }
 
     @PostMapping("/users/new")
     public String addUser(@RequestBody User user) throws SQLException
