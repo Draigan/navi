@@ -15,27 +15,27 @@ public class TaskController
     @Autowired
     private TasksService taskService;
 
-    @GetMapping("/tasks/user")
+    @GetMapping("/navi/tasks/user")
     public List<Task> getAllTasksForUser(@RequestParam String user) throws SQLException
     {
         return taskService.getAllTasksForUser(user);
     }
 
-    @PostMapping("/tasks/update")
+    @PostMapping("/navi/tasks/update")
     public String getAllTasksForUser(@RequestBody Task task) throws SQLException
     {
         taskService.updateTask(task);
         System.out.println(task.getName());
         return "Recieved row/task" + task.getIndex();
     }
-    @PostMapping("/tasks/add")
+    @PostMapping("/navi/tasks/add")
     public List<Task> addTaskForUser(@RequestBody Task task) throws SQLException
     {
         System.out.println("Adding task");
        return taskService.addNewTask(task);
     }
 
-    @PostMapping("/tasks/delete")
+    @PostMapping("/navi/tasks/delete")
     public List<Task> deleteTask(@RequestBody Task task) throws SQLException
     {
         System.out.println("deleting task:" + task.getName());
@@ -43,7 +43,7 @@ public class TaskController
 
     }
 
-    @PostMapping("/tasks/swap")
+    @PostMapping("/navi/tasks/swap")
     public List<Task> swapTasksOrder(@RequestBody Task task, @RequestParam String direction) throws SQLException
     {
         return taskService.swapOrderForTasks(task, direction);

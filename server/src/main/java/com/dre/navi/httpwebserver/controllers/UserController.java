@@ -18,33 +18,28 @@ public class UserController
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping("/navi/users")
     public String hello()
     {
         return "Hello";
     }
 
-    @GetMapping("/navi/users")
-    public String hello2()
-    {
-        return "Hello from navi";
-    }
 
-    @PostMapping("/users/new")
+    @PostMapping("/navi/users/new")
     public String addUser(@RequestBody User user) throws SQLException
     {
         userService.addUser(user.getUserName());
         return "Added new user: " + user.getUserName();
     }
 
-    @GetMapping("/users/all")
+    @GetMapping("/navi/users/all")
     public ResponseEntity<List<User>> getAllUsers() throws SQLException
     {
         List<User> allUsers = userService.getAllUsers();
         return ResponseEntity.ok().body(allUsers);
     }
 
-    @PostMapping("/users/delete")
+    @PostMapping("/navi/users/delete")
     public String deleteUser(@RequestBody User user) throws SQLException
     {
         userService.deleteUser(user.getId());
