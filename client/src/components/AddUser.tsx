@@ -26,7 +26,7 @@ export default function AddUser() {
   }
 
   return (
-    <div>
+    <div className="addnewuser">
       <TextField
         variant="outlined"
         error={invalidInput ? true : false}

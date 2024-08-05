@@ -1,10 +1,11 @@
+import { TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
 
 type Props = {
-  user: { userName: string; id: string };
+  user: User;
   setUser: Dispatch<SetStateAction<Partial<User>>>;
   setInUser: (param: boolean) => void;
 };
@@ -21,7 +22,8 @@ type User = {
 };
 
 export default function HamburgerMenu(props: Props) {
-  const { setInUser, user } = props;
+  const { setInUser, user, setUser } = props;
+  const [temp, setTemp] = useState();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -30,6 +32,12 @@ export default function HamburgerMenu(props: Props) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  function handleRoutinesRequired(data: string) {
+    // setTemp()
+    console.log(data);
+    setUser({ ...user, routinesRequired: Number(data) });
+  }
 
   return (
     <div>
@@ -61,6 +69,15 @@ export default function HamburgerMenu(props: Props) {
       >
         <div className="menu-username">{user.userName} </div>
         <MenuItem onClick={() => setInUser(true)}>Switch User</MenuItem>
+        <MenuItem>
+          <TextField
+            label="Routine Points Required"
+            id="outlined-size-small"
+            defaultValue={user.routinesRequired?.toString()}
+            size="small"
+            onChange={(data) => handleRoutinesRequired(data.target.value)}
+          />
+        </MenuItem>
       </Menu>
     </div>
   );

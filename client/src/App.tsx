@@ -6,6 +6,7 @@ import Jackpot from "./components/Jackpot";
 import Header from "./components/Header";
 import { Button } from "@mui/material";
 import useCheckForNewDate from "./hooks/useCheckForNewDate";
+import logo from "./assets/logo.png";
 
 type User = {
   userName: string;
@@ -71,7 +72,15 @@ function App() {
   if (inUser) {
     return (
       <div className="app">
-        <AddUser /> <SelectUser setUser={setUser} setInUser={setInUser} />
+        <div className="selectusermain">
+          <div className="header">
+            <div>
+              <img className="logo" src={logo} />
+              NAVI
+            </div>
+          </div>
+          <SelectUser setUser={setUser} setInUser={setInUser} /> <AddUser />
+        </div>
       </div>
     );
   }

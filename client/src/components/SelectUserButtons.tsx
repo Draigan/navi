@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import { useMutation, useQueryClient } from "react-query";
 import { deleteUser } from "../utils/axiosRequests";
 import { Dispatch, SetStateAction } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 type User = {
   userName: string;
@@ -30,6 +31,15 @@ export default function SelectUserButtons(props: Props) {
       queryClient.invalidateQueries("usersList");
     },
   });
+
+  const handleDelete = (userName: string, userId: string) => {
+    const isConfirmed = confirm(
+      `Are you sure you would like to delete user "${userName}"?`,
+    );
+    if (isConfirmed) {
+      mutate(userId);
+    }
+  };
   const buttons: JSX.Element[] = [];
   function handleClickUser(id: string, userName: string) {
     // Set the current user
@@ -43,19 +53,23 @@ export default function SelectUserButtons(props: Props) {
   }
 
   console.log(data, "from userButtons");
-  data?.forEach((user, index) =>
+  data?.forEach((user) =>
     buttons.push(
-      <>
+      <div key={Math.random()}>
         <Button
           onClick={() => handleClickUser(user.id, user.userName)}
-          key={`${index}`}
+          key={Math.random()}
+          className="usernamebutton"
         >
-          {user.userName} {user.id}
+          {user.userName}
         </Button>
-        <Button onClick={() => mutate(user.id)} key={`${index}`}>
-          delete
-        </Button>
-      </>,
+        <Button
+          onClick={() => handleDelete(user.userName, user.id)}
+          variant="text"
+          key={Math.random()}
+          startIcon={<DeleteIcon />}
+        />
+      </div>,
     ),
   );
 

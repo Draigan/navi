@@ -1,0 +1,18 @@
+.selectusermain {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.addnewuser {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.usernamebutton {
+  min-width: 185px !important;
+}
