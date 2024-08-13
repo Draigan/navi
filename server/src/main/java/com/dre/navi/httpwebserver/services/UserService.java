@@ -13,7 +13,9 @@ import java.util.UUID;
 public class UserService
 {
     PostgresJDBC db = PostgresJDBC.getInstance();
-
+    public void updateRequiredPoints(int points, String userId) throws SQLException {
+       db.setRequiredRoutine(points, userId);
+    }
     public List<User> getAllUsers() throws SQLException
     {
         return db.selectAllFromUsers();

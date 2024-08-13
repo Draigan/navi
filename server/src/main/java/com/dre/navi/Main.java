@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class Main {
 	public static void main(String[] args) throws SQLException
 	{
-		System.out.println("version 2");
+		System.out.println("version 4");
 		SpringApplication.run(Main.class, args);
 		PostgresJDBC db = PostgresJDBC.getInstance();
 		db.startConnection();

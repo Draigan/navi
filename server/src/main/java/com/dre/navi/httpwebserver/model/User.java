@@ -4,6 +4,9 @@ public class User
 {
     private String userName;
     private String id;
+    private String pointsRequired;
+    private String choresRequired;
+    private String tasksRequired;
 
     public User(String id, String userName)
     {
@@ -32,4 +35,27 @@ public class User
     }
 
 
+    public String getPointsRequired() {
+        return pointsRequired;
+    }
+
+    public void setPointsRequired(String pointsRequired) {
+        this.pointsRequired = pointsRequired;
+    }
+
+    public String getChoresRequired() {
+        return choresRequired;
+    }
+
+    public void setChoresRequired(String choresRequired) {
+        this.choresRequired = choresRequired;
+    }
+
+    public String getTasksRequired() {
+        return tasksRequired;
+    }
+
+    public void setTasksRequired(String tasksRequired) {
+        this.tasksRequired = tasksRequired;
+    }
 }

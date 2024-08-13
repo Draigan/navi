@@ -66,7 +66,7 @@ public class PostgresJDBC
     }
     private void createTableIfNotExistsUsers() throws SQLException
     {
-        PreparedStatement ps = connection.prepareStatement("create table if not exists users (user_id varchar(255), user_name varchar(255))");
+        PreparedStatement ps = connection.prepareStatement("create table if not exists users (user_id varchar(255), user_name varchar(255), required_routine int, required_chores int, required_chores int)");
         ps.executeUpdate();
         ps.close();
     }
@@ -117,6 +117,12 @@ public class PostgresJDBC
         return users;
     }
 
+    public void dropUsers() throws SQLException
+    {
+        PreparedStatement ps = connection.prepareStatement("drop table if exists users");
+        ps.executeUpdate();
+        ps.close();
+    }
 
     public void addUser(String id, String userName) throws SQLException
     {
@@ -440,6 +446,20 @@ public class PostgresJDBC
         ps.executeUpdate();
 
         // Close resources
+        ps.close();
+    }
+
+    //
+    // Update scores
+    //
+    public void setRequiredRoutine(int requiredPoints, String userId) throws SQLException {
+        System.out.println("Set Required Routine Firing ssql");
+        PreparedStatement ps = connection.prepareStatement("update users set required_points = ? where user_id = ?");
+        ps.setInt(1, requiredPoints);
+        ps.setString(2, userId);
+
+        ps.executeUpdate();
+
         ps.close();
     }
 }
