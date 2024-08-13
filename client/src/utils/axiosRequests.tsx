@@ -1,8 +1,23 @@
 import { GridRowModel } from "@mui/x-data-grid";
 import Axios from "axios";
 
-const URL = "https://3.142.251.237/navi";
-// const URL = "http://localhost:9090";
+// const URL = "https://3.142.251.237/navi";
+const URL = "http://localhost:9090/navi";
+
+// export async function updateRequiredPoints(id: string, points: number) {
+//   try {
+//     const response = await Axios.post(URL + "/users/updatepoints", null, {
+//       params: {
+//         id: id,
+//         points: points,
+//       },
+//     });
+//     console.log("Server:", response.data);
+//   } catch (error) {
+//     console.error("Error:", error);
+//     throw error; // Rethrow the error to be caught by the caller if needed
+//   }
+// }
 
 export async function postNewUser(userName: string) {
   try {

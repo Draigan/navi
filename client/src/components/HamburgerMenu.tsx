@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
+import { updateRequiredPoints } from "../utils/axiosRequests";
 
 type Props = {
   user: User;
@@ -34,9 +35,11 @@ export default function HamburgerMenu(props: Props) {
   };
 
   function handleRoutinesRequired(data: string) {
-    // setTemp()
-    console.log(data);
-    setUser({ ...user, routinesRequired: Number(data) });
+    //Remove non-numeric characters from the input value
+    setUser({ ...user, pointsRequired: Number(data) });
+    // updateRequiredPoints(user.id, Number(data));
+    localStorage.setItem('requiredPoints', data);
+
   }
 
   return (
@@ -73,9 +76,14 @@ export default function HamburgerMenu(props: Props) {
           <TextField
             label="Routine Points Required"
             id="outlined-size-small"
-            defaultValue={user.routinesRequired?.toString()}
+            defaultValue={Number(localStorage.getItem('requiredPoints'))}
             size="small"
             onChange={(data) => handleRoutinesRequired(data.target.value)}
+            type='number'
+            inputProps={{
+              inputMode: 'numeric', // Ensures a numeric keyboard is displayed on mobile devices
+              pattern: '[0-9]*',    // HTML5 validation pattern to ensure only numeric input
+            }}
           />
         </MenuItem>
       </Menu>

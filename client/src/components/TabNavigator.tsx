@@ -31,16 +31,6 @@ export default function TabNavigator(props: Props) {
   };
   return (
     <>
-      <div>
-        RequiredRoutines:{user.routinesRequired}
-        CurrentRoutines:{user.routinesChecked}
-      </div>
-      RequiredChores:{user.choresRequired}
-      Currentchores:{user.choresChecked}
-      <div>
-        requiredPOints:{user.pointsRequired}
-        currentPoints:{user.pointsChecked}
-      </div>
       <Box
         sx={{
           width: "100%",

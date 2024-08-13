@@ -27,7 +27,7 @@ function App() {
     userName: "diddy",
     id: "ebad6bb2-2fe3-4b8c-9025-0f7bedb865bc",
     routinesRequired: 0,
-    pointsRequired: 10,
+    pointsRequired: Number(localStorage.getItem('requiredPoints')),
     choresRequired: 0,
     routinesChecked: null,
     pointsChecked: 0,
@@ -98,6 +98,12 @@ function App() {
   return (
     <div className="app">
       <Header setInUser={setInUser} setUser={setUser} user={user as User} />
+      <div>user:{user.routinesRequired}</div>
+      <div>{user.routinesChecked}</div>
+      <div>chores:{user.choresRequired}</div>
+      <div>{user.choresChecked}</div>
+      <div>points:{user.pointsRequired}</div>
+      <div>{user.pointsChecked}</div>
       <TabNavigator setUser={setUser} user={user as User} />
       {isJackpotReady && (
         <Button variant="contained" onClick={() => setInJackpot(true)}>
