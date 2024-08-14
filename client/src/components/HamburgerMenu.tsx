@@ -3,7 +3,6 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
-import { updateRequiredPoints } from "../utils/axiosRequests";
 
 type Props = {
   user: User;
@@ -24,7 +23,6 @@ type User = {
 
 export default function HamburgerMenu(props: Props) {
   const { setInUser, user, setUser } = props;
-  const [temp, setTemp] = useState();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
