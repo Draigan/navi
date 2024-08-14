@@ -98,12 +98,6 @@ function App() {
   return (
     <div className="app">
       <Header setInUser={setInUser} setUser={setUser} user={user as User} />
-      <div>user:{user.routinesRequired}</div>
-      <div>{user.routinesChecked}</div>
-      <div>chores:{user.choresRequired}</div>
-      <div>{user.choresChecked}</div>
-      <div>points:{user.pointsRequired}</div>
-      <div>{user.pointsChecked}</div>
       <TabNavigator setUser={setUser} user={user as User} />
       {isJackpotReady && (
         <Button variant="contained" onClick={() => setInJackpot(true)}>
