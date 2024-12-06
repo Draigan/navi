@@ -66,7 +66,7 @@ public class PostgresJDBC
     }
     private void createTableIfNotExistsUsers() throws SQLException
     {
-        PreparedStatement ps = connection.prepareStatement("create table if not exists users (user_id varchar(255), user_name varchar(255), required_routine int, required_chores int, required_chores int)");
+        PreparedStatement ps = connection.prepareStatement("create table if not exists users (user_id varchar(255), user_name varchar(255), required_routine int, required_chores int)");
         ps.executeUpdate();
         ps.close();
     }
